@@ -4,104 +4,103 @@ import streamlit as st
 
 st.header("Tableau Reports")
 
-path1 = st.file_uploader(
+path_qa = st.sidebar.file_uploader(
     "QADataRaw2Polished",
     type="csv",
     accept_multiple_files=False,
 )
 
-path2 = st.file_uploader(
+path_equipment = st.sidebar.file_uploader(
     "Equipment Settings",
     type="csv",
     accept_multiple_files=False,
 )
 
-path3 = st.file_uploader(
+path_transactions = st.sidebar.file_uploader(
     "Transactions Details",
     type="csv",
     accept_multiple_files=False,
 )
 
-if path1:
+if path_qa:
     st.header("Slab Information")
 
-    df1 = pd.read_csv(
-        path1,
+    df_qa = pd.read_csv(
+        path_qa,
         parse_dates=["SlabCreateDate"],
     )
 
     design_list = st.sidebar.multiselect(
-        "Design", df1["DESIGN"].unique(), default=df1["DESIGN"].unique()
+        "Design", df_qa["DESIGN"].unique(), default=df_qa["DESIGN"].unique()
     )
-    df1 = df1[df1["DESIGN"].isin(design_list)]
+    df_qa = df_qa[df_qa["DESIGN"].isin(design_list)]
 
     thickness_list = st.sidebar.multiselect(
-        "Thickness", df1["TH"].unique(), default=df1["TH"].unique()
+        "Thickness", df_qa["TH"].unique(), default=df_qa["TH"].unique()
     )
-    df1 = df1[df1["TH"].isin(thickness_list)]
+    df_qa = df_qa[df_qa["TH"].isin(thickness_list)]
 
-    fg_number_list = st.sidebar.multiselect("Slab #", df1["FG #"].unique())
-    df1 = df1[df1["FG #"].isin(fg_number_list)]
+    fg_number_list = st.sidebar.multiselect("Slab #", df_qa["FG #"].unique())
+    df_qa = df_qa[df_qa["FG #"].isin(fg_number_list)]
 
-    df1 = df1[["TH", "DESIGN", "FG #", "SlabCreateDate"]].drop_duplicates()
+    df_qa = df_qa[["TH", "DESIGN", "FG #", "SlabCreateDate"]].drop_duplicates()
 
-    st.dataframe(df1)
+    st.dataframe(df_qa)
 
 
-if path2:
+if path_equipment:
     st.header("Mixer Information")
 
-    df2 = pd.read_csv(
-        path2,
+    df_equipment = pd.read_csv(
+        path_equipment,
         parse_dates=["Record Timestamp"],
     )
 
-    end_time = df1["SlabCreateDate"].values[0]
+    end_time = df_qa["SlabCreateDate"].values[0]
     start_time = end_time - np.timedelta64(6, "h")
 
-    design = df1["DESIGN"].values[0]
+    design = df_qa["DESIGN"].values[0]
 
-    df2 = df2[
+    df_equipment = df_equipment[
         (
-            (df2["Record Timestamp"] >= start_time)
-            & (df2["Record Timestamp"] <= end_time)
-            & (df2["Design"] == design)
+            (df_equipment["Record Timestamp"] >= start_time)
+            & (df_equipment["Record Timestamp"] <= end_time)
+            & (df_equipment["Design"] == design)
         )
     ]
 
-    st.dataframe(df2)
+    st.dataframe(df_equipment)
 
-if path3:
+if path_transactions:
     st.header("Hopper Transactions")
 
-    df3 = pd.read_csv(
-        path3,
+    df_transactions = pd.read_csv(
+        path_transactions,
         parse_dates=["Transaction Date"],
     )
 
-    df2["Record Timestamp"].max()
+    df_equipment["Record Timestamp"].max()
 
-    end_mixer_time = df2["Record Timestamp"].max()
-    start_mixer_time = df2["Record Timestamp"].min() - np.timedelta64(6, "h")
+    end_mixer_time = df_equipment["Record Timestamp"].max()
+    start_mixer_time = df_equipment["Record Timestamp"].min() - np.timedelta64(6, "h")
 
-    raw_materials = df2["DESCRIPTION"].unique().tolist()
+    raw_materials = df_equipment["DESCRIPTION"].unique().tolist()
 
-    df3 = df3[
+    df_transactions = df_transactions[
         (
-            (df3["Transaction Date"] >= start_mixer_time)
-            & (df3["Transaction Date"] <= end_mixer_time)
-            & (df3["Item Description"].isin(raw_materials))
+            (df_transactions["Transaction Date"] >= start_mixer_time)
+            & (df_transactions["Transaction Date"] <= end_mixer_time)
+            & (df_transactions["Item Description"].isin(raw_materials))
         )
     ]
 
-    st.dataframe(df3)
+    st.dataframe(df_transactions)
 
     @st.cache
     def convert_df(df):
-        # IMPORTANT: Cache the conversion to prevent computation on every rerun
         return df.to_csv().encode("utf-8")
 
-    csv = convert_df(df3)
+    csv = convert_df(df_transactions)
 
     st.download_button(
         label="Download 'Hopper Transactions' as CSV",
