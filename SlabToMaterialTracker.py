@@ -2,7 +2,11 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-st.header("Tableau Reports")
+st.set_page_config(
+    page_title="SlabToMaterialTracker",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 path_qa = st.sidebar.file_uploader(
     "QADataRaw2Polished",
