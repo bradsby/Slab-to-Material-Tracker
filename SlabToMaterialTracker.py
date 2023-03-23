@@ -35,12 +35,12 @@ if path_qa:
         parse_dates=["SlabCreateDate"],
     )
 
-    design_list = st.sidebar.multiselect(
+    design_list = st.multiselect(
         "Design", df_qa["DESIGN"].unique(), default=df_qa["DESIGN"].unique()
     )
     df_qa = df_qa[df_qa["DESIGN"].isin(design_list)]
 
-    thickness_list = st.sidebar.multiselect(
+    thickness_list = st.multiselect(
         "Thickness", df_qa["TH"].unique(), default=df_qa["TH"].unique()
     )
     df_qa = df_qa[df_qa["TH"].isin(thickness_list)]
