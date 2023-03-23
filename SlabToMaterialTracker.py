@@ -39,7 +39,7 @@ if path_qa:
     df_qa = format_headers(
         pd.read_csv(
             path_qa,
-            parse_dates=["SLABCREATEDATE"],
+            parse_dates=["SlabCreateDate"],
         )
     )
 
