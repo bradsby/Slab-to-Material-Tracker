@@ -2,9 +2,15 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+
+def format_headers(df):
+    df.columns = df.columns.str.replace(" ", "_").str.upper()
+    return df
+
+
 st.set_page_config(
     page_title="SlabToMaterialTracker",
-    page_icon='📍',
+    page_icon="📍",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -30,25 +36,27 @@ path_transactions = st.sidebar.file_uploader(
 if path_qa:
     st.header("Slab Information")
 
-    df_qa = pd.read_csv(
-        path_qa,
-        parse_dates=["SlabCreateDate"],
+    df_qa = format_headers(
+        pd.read_csv(
+            path_qa,
+            parse_dates=["SLABCREATEDATE"],
+        )
     )
 
     design_list = st.multiselect(
         "Design", df_qa["DESIGN"].unique(), default=df_qa["DESIGN"].unique()
     )
-    df_qa = df_qa[df_qa["DESIGN"].isin(design_list)]
+    df_qa = df_qa.query("DESIGN.isin(@design_list")
 
     thickness_list = st.multiselect(
         "Thickness", df_qa["TH"].unique(), default=df_qa["TH"].unique()
     )
-    df_qa = df_qa[df_qa["TH"].isin(thickness_list)]
+    df_qa = df_qa.query("TH.isin(@thickness_list")
 
-    fg_number_list = st.multiselect("Slab #", df_qa["FG #"].unique())
-    df_qa = df_qa[df_qa["FG #"].isin(fg_number_list)]
+    fg_number_list = st.multiselect("Slab #", df_qa["FG_#"].unique())
+    df_qa = df_qa[df_qa["FG_#"].isin(fg_number_list)]
 
-    df_qa = df_qa[["TH", "DESIGN", "FG #", "SlabCreateDate"]].drop_duplicates()
+    df_qa = df_qa[["TH", "DESIGN", "FG_#", "SLABCREATEDATE"]].drop_duplicates()
 
     st.dataframe(df_qa)
 
@@ -56,48 +64,45 @@ if path_qa:
 if path_equipment:
     st.header("Mixer Information")
 
-    df_equipment = pd.read_csv(
-        path_equipment,
-        parse_dates=["Record Timestamp"],
+    df_equipment = format_headers(
+        pd.read_csv(
+            path_equipment,
+            parse_dates=["RECORD_TIMESTAMP"],
+        )
     )
 
-    end_time = df_qa["SlabCreateDate"].values[0]
+    end_time = df_qa["SLABCREATEDATE"].values[0]
     start_time = end_time - np.timedelta64(6, "h")
 
     design = df_qa["DESIGN"].values[0]
 
-    df_equipment = df_equipment[
-        (
-            (df_equipment["Record Timestamp"] >= start_time)
-            & (df_equipment["Record Timestamp"] <= end_time)
-            & (df_equipment["Design"] == design)
-        )
-    ]
-
+    df_equipment = df_equipment.query(
+        "DESIGN==@design and @start_time <= RECORD_TIMESTAMP <= @end_time"
+    )
     st.dataframe(df_equipment)
 
 if path_transactions:
     st.header("Hopper Transactions")
 
-    df_transactions = pd.read_csv(
-        path_transactions,
-        parse_dates=["Transaction Date"],
+    df_transactions = format_headers(
+        pd.read_csv(
+            path_transactions,
+            parse_dates=["TRANSACTION_DATE"],
+        )
     )
 
-    df_equipment["Record Timestamp"].max()
+    df_equipment["RECORD_TIMESTAMP"].max()
 
-    end_mixer_time = df_equipment["Record Timestamp"].max()
-    start_mixer_time = df_equipment["Record Timestamp"].min() - np.timedelta64(6, "h")
+    end_mixer_time = df_equipment["RECORD_TIMESTAMP"].max()
+    start_mixer_time = df_equipment["RECORD_TIMESTAMP"].min() - np.timedelta64(6, "h")
 
-    raw_materials = df_equipment["DESCRIPTION"].unique().tolist()
+    raw_materials_list = st.multiselect(
+        "Raw Materials", df_qa["ITEM_DESCRIPTION"].unique()
+    )
 
-    df_transactions = df_transactions[
-        (
-            (df_transactions["Transaction Date"] >= start_mixer_time)
-            & (df_transactions["Transaction Date"] <= end_mixer_time)
-            & (df_transactions["Item Description"].isin(raw_materials))
-        )
-    ]
+    df_transactions = df_transactions.query(
+        "ITEM_DESCRIPTION.isin(@design) and @start_mixer_time <= TRANSACTION_DATE <= @end_mixer_time"
+    )
 
     st.dataframe(df_transactions)
 
