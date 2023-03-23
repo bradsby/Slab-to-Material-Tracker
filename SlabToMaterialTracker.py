@@ -11,7 +11,6 @@ def format_headers(df):
 st.set_page_config(
     page_title="SlabToMaterialTracker",
     page_icon="📍",
-    layout="wide",
     initial_sidebar_state="expanded",
 )
 
@@ -43,6 +42,8 @@ if path_qa:
         )
     )
 
+    df_qa = df_qa.rename(columns={"FG_#": "FG_Number"})
+    
     design_list = st.multiselect(
         "Design", df_qa["DESIGN"].unique(), default=df_qa["DESIGN"].unique()
     )
@@ -53,12 +54,16 @@ if path_qa:
     )
     df_qa = df_qa.query("TH==@thickness_list")
 
-    fg_number_list = st.multiselect("Slab #", df_qa["FG_#"].unique())
-    df_qa = df_qa.query("FG_#==@fg_number_list")
+    fg_number_list = st.multiselect("Slab #", df_qa["FG_Number"].unique())
+    df_qa = df_qa.query("FG_Number==@fg_number_list")
 
-    df_qa = df_qa[["TH", "DESIGN", "FG_#", "SLABCREATEDATE"]].drop_duplicates()
+    df_qa = df_qa[["TH", "DESIGN", "FG_Number", "SLABCREATEDATE"]].drop_duplicates()
 
-    st.dataframe(df_qa)
+    try:
+        st.dataframe(df_qa)
+    except pd.errors.UndefinedVariableError:
+        st.warning("Choose slab number(s).")
+
 
 
 if path_equipment:
