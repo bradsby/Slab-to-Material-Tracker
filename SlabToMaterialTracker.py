@@ -45,7 +45,7 @@ if path_qa:
     )
     df_qa = df_qa[df_qa["TH"].isin(thickness_list)]
 
-    fg_number_list = st.sidebar.multiselect("Slab #", df_qa["FG #"].unique())
+    fg_number_list = st.multiselect("Slab #", df_qa["FG #"].unique())
     df_qa = df_qa[df_qa["FG #"].isin(fg_number_list)]
 
     df_qa = df_qa[["TH", "DESIGN", "FG #", "SlabCreateDate"]].drop_duplicates()
