@@ -46,15 +46,15 @@ if path_qa:
     design_list = st.multiselect(
         "Design", df_qa["DESIGN"].unique(), default=df_qa["DESIGN"].unique()
     )
-    df_qa = df_qa.query("DESIGN.isin(@design_list")
+    df_qa = df_qa.query("DESIGN==@design_list")
 
     thickness_list = st.multiselect(
         "Thickness", df_qa["TH"].unique(), default=df_qa["TH"].unique()
     )
-    df_qa = df_qa.query("TH.isin(@thickness_list")
+    df_qa = df_qa.query("TH==@thickness_list")
 
     fg_number_list = st.multiselect("Slab #", df_qa["FG_#"].unique())
-    df_qa = df_qa[df_qa["FG_#"].isin(fg_number_list)]
+    df_qa = df_qa.query("FG_#==@fg_number_list")
 
     df_qa = df_qa[["TH", "DESIGN", "FG_#", "SLABCREATEDATE"]].drop_duplicates()
 
@@ -101,7 +101,7 @@ if path_transactions:
     )
 
     df_transactions = df_transactions.query(
-        "ITEM_DESCRIPTION.isin(@design) and @start_mixer_time <= TRANSACTION_DATE <= @end_mixer_time"
+        "ITEM_DESCRIPTION==@raw_materials_list and @start_mixer_time <= TRANSACTION_DATE <= @end_mixer_time"
     )
 
     st.dataframe(df_transactions)
