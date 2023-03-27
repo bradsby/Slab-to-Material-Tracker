@@ -72,7 +72,7 @@ if path_equipment:
     df_equipment = format_headers(
         pd.read_csv(
             path_equipment,
-            parse_dates=["RECORD_TIMESTAMP"],
+            parse_dates=["Record Timestamp"],
         )
     )
 
