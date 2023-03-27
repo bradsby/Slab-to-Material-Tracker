@@ -102,7 +102,7 @@ if path_transactions:
     start_mixer_time = df_equipment["RECORD_TIMESTAMP"].min() - np.timedelta64(6, "h")
 
     raw_materials_list = st.multiselect(
-        "Raw Materials", df_qa["ITEM_DESCRIPTION"].unique()
+        "Raw Materials", sorted(df_transactions["ITEM_DESCRIPTION"].unique())
     )
 
     df_transactions = df_transactions.query(
