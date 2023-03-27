@@ -84,7 +84,7 @@ if path_equipment:
     df_equipment = df_equipment.query(
         "DESIGN==@design and @start_time <= RECORD_TIMESTAMP <= @end_time"
     )
-    st.dataframe(df_equipment)
+    st.dataframe(df_equipment, use_container_width=True)
 
 if path_transactions:
     st.header("Hopper Transactions")
@@ -109,7 +109,7 @@ if path_transactions:
         "ITEM_DESCRIPTION==@raw_materials_list and @start_mixer_time <= TRANSACTION_DATE <= @end_mixer_time"
     )
 
-    st.dataframe(df_transactions)
+    st.dataframe(df_transactions, use_container_width=True)
 
     @st.cache
     def convert_df(df):
