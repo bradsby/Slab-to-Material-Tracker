@@ -92,7 +92,7 @@ if path_transactions:
     df_transactions = format_headers(
         pd.read_csv(
             path_transactions,
-            parse_dates=["TRANSACTION_DATE"],
+            parse_dates=["Transaction Date"],
         )
     )
 
