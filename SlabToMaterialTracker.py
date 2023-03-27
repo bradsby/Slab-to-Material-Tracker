@@ -111,7 +111,7 @@ if path_transactions:
 
     st.dataframe(df_transactions, use_container_width=True)
 
-    @st.cache
+    @st.cache_data
     def convert_df(df):
         return df.to_csv().encode("utf-8")
 
